@@ -1,19 +1,28 @@
 import React, {useState, useRef} from 'react';
-import { Text, StyleSheet, View, Button, TouchableOpacity, Card, Background, Logo, Header, Title } from "react-native";
+import { Text, TextInput, StyleSheet, View, Button, TouchableOpacity, Card, Background, Logo, Header, Title } from "react-native";
 import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
 
-const styles = StyleSheet.create({
-  text: {
-    fontSize: 30
-  }
-});
+var newestURI = null;
+var recordingList = [
+	{name: "", uriAddress: ""}
+];
 
 const RecordingScreen = (props) => {
-	const [recording, setRecording] = React.useState();
+	const [recording, setRecording] = useState();
 	const AudioPlayer = new Audio.Sound();
+	const [recordingName, setName] = useState('');
+
+	const [recordings, setRecordings] = useState(recordingList);
+
+	const [currentTextInput, clearInput] = useState('');
 
 	async function startRecording() {
     try {
+      if(newestURI != null){
+      	FileSystem.deleteAsync(newestURI);
+      }
+
       console.log('Requesting permissions..');
       await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
@@ -35,28 +44,94 @@ const RecordingScreen = (props) => {
     console.log('Stopping recording..');
     setRecording(undefined);
     await recording.stopAndUnloadAsync();
-    const ruri = recording.getURI(); 
+    newestURI = recording.getURI();
+  }
 
-    // Load the Recorded URI
-    await AudioPlayer.loadAsync({
-      uri: ruri
-    }, {volume: 1
-    });
+  async function replay() {
+  	if(newestURI != null)
+  	{
+  		AudioPlayer.unloadAsync();
+	    // Load the Recorded URI
+	    await AudioPlayer.loadAsync({
+	      uri: newestURI
+	    }, {volume: 1
+	    });
 
-    // Play the audio
-    AudioPlayer.playAsync();
+	    // Play the audio
+	    AudioPlayer.playAsync();
 
-	console.log("Playing Sound");
+		console.log("Playing Sound");
+  	}
+  }
+
+  async function deleteRecording() {
+      if(newestURI != null){
+      	FileSystem.deleteAsync(newestURI);
+      }
+  }
+
+  async function saveRecording() {
+      if(newestURI != null){
+      	setRecordings(recordings => [...recordings, {"name" : recordingName, "uri": newestURI}]);
+
+      	console.debug([...recordings, {"name" : recordingName, "uri": newestURI}]);
+
+      	clearInput('');
+      	newestURI = null;
+      }
   }
 
   	return (
-     <View style={styles.container}>
+     <View style={styles.page}>
       <Button
         title={recording ? 'Stop Recording' : 'Start Recording'}
         onPress={recording ? stopRecording : startRecording}
       />
+
+      <Button
+        title={recording ? 'Recording in progress...' : 'Replay'}
+        onPress={recording ? null : replay}
+      />
+
+      <Button
+        title={recording ? 'Recording in progress...' : 'Delete recording'}
+        onPress={recording ? null : deleteRecording}
+      />
+
+      <View style = {styles.saveButton}>
+	      <Button
+	        title={recording ? 'Recording in progress...' : 'Save recording as:'}
+	        onPress={recording ? null : saveRecording}
+	      />
+	  </View>
+
+      <View>
+      	<TextInput 
+      		style = {styles.background} 
+      		placeholder = "Recording Name"
+      		onChangeText={text => setName(text)}
+      	/>
+      </View>
     </View>
     )
 };
+
+const styles = StyleSheet.create({
+  background: {
+    backgroundColor: '#cccccc', 
+    height:50,
+    flexDirection: 'row',
+    width:150,
+    justifyContent: 'center',
+  },
+
+  page: {
+  	alignItems: 'center',
+  },
+
+  saveButton: {
+  	marginTop:20,
+  }
+});
 
 export default RecordingScreen;
