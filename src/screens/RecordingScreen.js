@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react';
-import { Text, TextInput, StyleSheet, View, Button, TouchableOpacity, Card, Background, Logo, Header, Title } from "react-native";
+import { Text, TextInput, StyleSheet, View, Button, TouchableOpacity, Card, Background, Logo, Header, Title, FlatList } from "react-native";
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 
@@ -13,6 +13,7 @@ const RecordingScreen = (props) => {
 	const AudioPlayer = new Audio.Sound();
 	const [recordingName, setName] = useState('');
 
+	//List of saved recordings with name and URI
 	const [recordings, setRecordings] = useState(recordingList);
 
 	const [currentTextInput, clearInput] = useState('');
@@ -72,9 +73,9 @@ const RecordingScreen = (props) => {
 
   async function saveRecording() {
       if(newestURI != null){
-      	setRecordings(recordings => [...recordings, {"name" : recordingName, "uri": newestURI}]);
+      	setRecordings(recordings => [...recordings, {name : recordingName, uriAddress: newestURI}]);
 
-      	console.debug([...recordings, {"name" : recordingName, "uri": newestURI}]);
+      	console.debug([...recordings, {name : recordingName, uriAddress: newestURI}]);
 
       	clearInput('');
       	newestURI = null;
@@ -112,6 +113,17 @@ const RecordingScreen = (props) => {
       		onChangeText={text => setName(text)}
       	/>
       </View>
+
+      <FlatList
+      	data = {recordings}
+      	keyExtractor = { (recording) => {return recording}}
+      	renderItem = {({item}) => {
+      		return(
+      			<Text> {item.name}</Text>
+      		)
+      	}
+      	}
+      />
     </View>
     )
 };
