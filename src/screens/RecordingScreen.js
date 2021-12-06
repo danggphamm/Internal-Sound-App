@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react';
-import { Text, TextInput, StyleSheet, View, Button, TouchableOpacity, Card, Background, Title, FlatList } from "react-native";
+import { Text, TextInput, StyleSheet, View, Button, TouchableOpacity, Card, Background, Title, FlatList, Image } from "react-native";
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 
@@ -120,26 +120,30 @@ const RecordingScreen = (props) => {
 
   	return (
      <View style={styles.page}>
-      <Button
-        title={recording ? 'Stop Recording' : 'Start Recording'}
-        onPress={recording ? stopRecording : startRecording}
-      />
+      <View>
+	      <TouchableOpacity onPress={recording ? stopRecording : startRecording}>
+	      	<Image style = {styles.image} source = {require('../../assets/recording.png')}/>
+	      </TouchableOpacity>
+	  </View>
 
-      <Button
-        title={recording ? 'Recording in progress...' : 'Replay'}
-        onPress={recording ? null : replay}
-      />
+	  <View  style = {styles.button}>
+	      <TouchableOpacity onPress={recording ? null : replay}>
+	      	<Text style = {styles.page}>{recording ? 'Recording in progress...' : 'Replay'}</Text>
+	      </TouchableOpacity>
+	  </View>
 
-      <Button
-        title={recording ? 'Recording in progress...' : 'Delete recording'}
-        onPress={recording ? null : deleteRecording}
-      />
+	  <View  style = {styles.button}>
+	      <TouchableOpacity onPress={recording ? null : deleteRecording}>
+	      	<Text style = {styles.page}>{recording ? 'Recording in progress...' : 'Delete recording'}</Text>
+	      </TouchableOpacity>
+	  </View>
 
       <View style = {styles.saveButton}>
-	      <Button
-	        title={recording ? 'Recording in progress...' : 'Save recording as:'}
-	        onPress={recording ? null : saveRecording}
-	      />
+      	  <View>
+		      <TouchableOpacity onPress={recording ? null : saveRecording}>
+		      	<Text style = {styles.page}>{recording ? 'Recording in progress...' : 'Save recording as:'}</Text>
+		      </TouchableOpacity>
+	  	  </View>
 	  </View>
 
 	  <View stye = {styles.text}>
@@ -203,6 +207,16 @@ const styles = StyleSheet.create({
 
   text:{
   	textAlign: 'center',
+  },
+
+  image: {
+    justifyContent: 'center',
+    width: 50,
+    height: 50
+  },
+
+  button: {
+    height: 30
   }
 });
 
