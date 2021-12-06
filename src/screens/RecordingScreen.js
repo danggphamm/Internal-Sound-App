@@ -165,7 +165,7 @@ const RecordingScreen = (props) => {
       <View>
       	<TextInput 
       		style = {styles.background} 
-      		placeholder = "Recording Name"
+      		placeholder = "Recording's name"
       		onChangeText={text => setName(text)}
       	/>
       </View>
@@ -175,11 +175,12 @@ const RecordingScreen = (props) => {
       	keyExtractor = { (recording) => {return recording}}
       	renderItem = {({item}) => {
       		return(
-      			<View style = {styles.replayBox}>
+      			<View >
       				<TouchableOpacity
+      					style = {styles.trackList}
       					onPress = {() => replaySpecific(item.uriAddress)}
       				>
-				        <Text style = {styles.text}> {item.name}</Text>
+				        <Text style = {styles.trackListText}> {item.name}</Text>
 				    </TouchableOpacity>
       				
       			</View>
@@ -203,6 +204,8 @@ const styles = StyleSheet.create({
 
   page: {
   	alignItems: 'center',
+  	flex: 1,
+  	backgroundColor: '#0571b0',
   },
 
   saveButton: {
@@ -242,6 +245,16 @@ const styles = StyleSheet.create({
 
   replayAndDelete: {
   	flexDirection: 'row',
+  },
+
+  trackList:{
+  	alignItems: 'center',
+    flex: 1 
+  },
+  
+  trackListText:{
+    fontSize: 20,
+    margin: 10
   }
 });
 
