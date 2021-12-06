@@ -4,12 +4,18 @@ import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 
 var newestURI = null;
+var recordingButtonImg = require('../../assets/onrecording.png');
+const recordingImage = require('../../assets/recording.png');
+const onRecordingImage = require('../../assets/onrecording.png');
 
 // List of the recordings
 var recordingList = [
 ];
 
 const RecordingScreen = (props) => {
+	// State of actions: recording, playing, ...
+	const [recordingImg, setRecordingImg] = useState(require('../../assets/recording.png'));
+
 	// State of actions: recording, playing, ...
 	const [recording, setRecording] = useState();
 
@@ -46,6 +52,8 @@ const RecordingScreen = (props) => {
          Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
       );
       setRecording(recording);
+
+      setRecordingImg(require('../../assets/onrecording.png'));
       console.log('Recording started');
     } catch (err) {
       console.error('Failed to start recording', err);
@@ -56,6 +64,8 @@ const RecordingScreen = (props) => {
   async function stopRecording() {
     console.log('Stopping recording..');
     setRecording(undefined);
+    setRecordingImg(require('../../assets/recording.png'));
+  	let recordingButtonImg = recording ? recordingImage : onRecordingImage;
     await recording.stopAndUnloadAsync();
     newestURI = recording.getURI();
   }
@@ -122,26 +132,28 @@ const RecordingScreen = (props) => {
      <View style={styles.page}>
       <View>
 	      <TouchableOpacity onPress={recording ? stopRecording : startRecording}>
-	      	<Image style = {styles.image} source = {require('../../assets/recording.png')}/>
+	      	<Image style = {styles.recordingImage} source = {recordingImg}/>
 	      </TouchableOpacity>
 	  </View>
 
-	  <View  style = {styles.button}>
-	      <TouchableOpacity onPress={recording ? null : replay}>
-	      	<Text style = {styles.page}>{recording ? 'Recording in progress...' : 'Replay'}</Text>
-	      </TouchableOpacity>
+	  <View style = {styles.replayAndDelete}>
+		  <View >
+		      <TouchableOpacity onPress={recording ? null : replay}>
+		      	<Image style = {styles.image} source = {require('../../assets/replay.png')}/>
+		      </TouchableOpacity>
+		  </View>
+
+		  <View>
+		      <TouchableOpacity onPress={recording ? null : deleteRecording}>
+		      	<Image style = {styles.image} source = {require('../../assets/delete.png')}/>
+		      </TouchableOpacity>
+		  </View>
 	  </View>
 
-	  <View  style = {styles.button}>
-	      <TouchableOpacity onPress={recording ? null : deleteRecording}>
-	      	<Text style = {styles.page}>{recording ? 'Recording in progress...' : 'Delete recording'}</Text>
-	      </TouchableOpacity>
-	  </View>
-
-      <View style = {styles.saveButton}>
+      <View>
       	  <View>
 		      <TouchableOpacity onPress={recording ? null : saveRecording}>
-		      	<Text style = {styles.page}>{recording ? 'Recording in progress...' : 'Save recording as:'}</Text>
+		      	<Image style = {styles.image} source = {require('../../assets/save.png')}/>
 		      </TouchableOpacity>
 	  	  </View>
 	  </View>
@@ -201,7 +213,7 @@ const styles = StyleSheet.create({
   	marginTop: 10,
     backgroundColor: '#cccccc',
     width:150,
-    justifyContent: 'center',
+    alignSelf: 'flex-start',
     borderWidth: 5,
   },
 
@@ -212,11 +224,24 @@ const styles = StyleSheet.create({
   image: {
     justifyContent: 'center',
     width: 50,
-    height: 50
+    height: 50,
+    marginBottom: 10,
+    marginLeft: 10,
+    marginRight: 10,
   },
 
-  button: {
-    height: 30
+  recordingImage: {
+    justifyContent: 'center',
+    width: 75,
+    height: 75,
+    marginTop: 20,
+    marginBottom: 20,
+    marginLeft: 10,
+    marginRight: 10,
+  },
+
+  replayAndDelete: {
+  	flexDirection: 'row',
   }
 });
 
