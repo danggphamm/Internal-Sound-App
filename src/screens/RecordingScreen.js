@@ -1,23 +1,34 @@
 import React, {useState, useRef} from 'react';
-import { Text, TextInput, StyleSheet, View, Button, TouchableOpacity, Card, Background, Logo, Header, Title, FlatList } from "react-native";
+import { Text, TextInput, StyleSheet, View, Button, TouchableOpacity, Card, Background, Title, FlatList } from "react-native";
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 
 var newestURI = null;
+
+// List of the recordings
 var recordingList = [
-	{name: "", uriAddress: ""}
 ];
 
 const RecordingScreen = (props) => {
+	// State of actions: recording, playing, ...
 	const [recording, setRecording] = useState();
-	const AudioPlayer = new Audio.Sound();
+
+	// Name of the current ecording going to be saved
 	const [recordingName, setName] = useState('');
 
-	//List of saved recordings with name and URI
+	// The saving dialogue. "Saved" if sucessfully save the recording. "There's lready a file with the same name" if dupicate name. 
+	const [savingDialogue, setDialogue] = useState();
+
+	// List of saved recordings with name and URI
 	const [recordings, setRecordings] = useState(recordingList);
 
+	// Current text in the text input box
 	const [currentTextInput, clearInput] = useState('');
 
+	// Audio player
+	const AudioPlayer = new Audio.Sound();
+
+	// Record
 	async function startRecording() {
     try {
       if(newestURI != null){
@@ -41,6 +52,7 @@ const RecordingScreen = (props) => {
     }
   }
 
+  // Stop recording
   async function stopRecording() {
     console.log('Stopping recording..');
     setRecording(undefined);
@@ -48,6 +60,7 @@ const RecordingScreen = (props) => {
     newestURI = recording.getURI();
   }
 
+  // Replay the recording
   async function replay() {
   	if(newestURI != null)
   	{
@@ -60,8 +73,22 @@ const RecordingScreen = (props) => {
 
 	    // Play the audio
 	    AudioPlayer.playAsync();
+  	}
+  }
 
-		console.log("Playing Sound");
+  // Replay each recording
+  async function replaySpecific(inputURI) {
+  	if(inputURI != null)
+  	{
+  		AudioPlayer.unloadAsync();
+	    // Load the Recorded URI
+	    await AudioPlayer.loadAsync({
+	      uri: inputURI
+	    }, {volume: 1
+	    });
+
+	    // Play the audio
+	    AudioPlayer.playAsync();
   	}
   }
 
@@ -72,14 +99,23 @@ const RecordingScreen = (props) => {
   }
 
   async function saveRecording() {
-      if(newestURI != null){
+  	// Check if the name already exist. If not, save the recording as the input name
+  	if(!recordings.some(item => recordingName === item.name)){
+      if(newestURI != null ){
       	setRecordings(recordings => [...recordings, {name : recordingName, uriAddress: newestURI}]);
+      	setDialogue("Saved!");
 
       	console.debug([...recordings, {name : recordingName, uriAddress: newestURI}]);
 
       	clearInput('');
       	newestURI = null;
       }
+    }
+
+    // Else notify the user that the name is duplicate
+    else{
+    	setDialogue("Duplicate name! Please choose another name!");
+    }
   }
 
   	return (
@@ -106,6 +142,10 @@ const RecordingScreen = (props) => {
 	      />
 	  </View>
 
+	  <View stye = {styles.text}>
+	      <Text>{savingDialogue}</Text>
+	  </View>
+
       <View>
       	<TextInput 
       		style = {styles.background} 
@@ -119,7 +159,14 @@ const RecordingScreen = (props) => {
       	keyExtractor = { (recording) => {return recording}}
       	renderItem = {({item}) => {
       		return(
-      			<Text> {item.name}</Text>
+      			<View style = {styles.replayBox}>
+      				<TouchableOpacity
+      					onPress = {() => replaySpecific(item.uriAddress)}
+      				>
+				        <Text style = {styles.text}> {item.name}</Text>
+				    </TouchableOpacity>
+      				
+      			</View>
       		)
       	}
       	}
@@ -130,6 +177,7 @@ const RecordingScreen = (props) => {
 
 const styles = StyleSheet.create({
   background: {
+  	textAlign: 'center',
     backgroundColor: '#cccccc', 
     height:50,
     flexDirection: 'row',
@@ -143,6 +191,18 @@ const styles = StyleSheet.create({
 
   saveButton: {
   	marginTop:20,
+  },
+
+  replayBox: {
+  	marginTop: 10,
+    backgroundColor: '#cccccc',
+    width:150,
+    justifyContent: 'center',
+    borderWidth: 5,
+  },
+
+  text:{
+  	textAlign: 'center',
   }
 });
 
