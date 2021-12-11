@@ -31,6 +31,9 @@ const RecordingScreen = (props) => {
 	// Current text in the text input box
 	const [currentTextInput, clearInput] = useState('');
 
+	// Current screen
+	const [currentScreen, setSreen] = useState("Recording");
+
 	// Audio player
 	const AudioPlayer = new Audio.Sound();
 
@@ -127,69 +130,124 @@ const RecordingScreen = (props) => {
     	setDialogue("Duplicate name! Please choose another name!");
     }
   }
+  	if(currentScreen == "Recording"){
+	  	return (
+	      <View style={styles.page}>
+	     	<View style= {styles.screenButtons}>
+		      <TouchableOpacity 
+		      	onPress={() =>  setSreen("Recording")} style ={styles.screenButton} >
+		      	<Text style = {styles.text}>Recording</Text>
+		      </TouchableOpacity>
 
-  	return (
-     <View style={styles.page}>
-      <View>
-	      <TouchableOpacity onPress={recording ? stopRecording : startRecording}>
-	      	<Image style = {styles.recordingImage} source = {recordingImg}/>
-	      </TouchableOpacity>
-	  </View>
+		      <TouchableOpacity onPress={() =>  setSreen("Listening")} style ={styles.screenButton} >
+		      	<Text style = {styles.text}>Listening</Text>
+		      </TouchableOpacity>
 
-	  <View style = {styles.replayAndDelete}>
-		  <View >
-		      <TouchableOpacity onPress={recording ? null : replay}>
-		      	<Image style = {styles.image} source = {require('../../assets/replay.png')}/>
+		      <TouchableOpacity onPress={() =>  setSreen("Editing")} style ={styles.screenButton} >
+		      	<Text style = {styles.text}>Editing</Text>
 		      </TouchableOpacity>
 		  </View>
 
-		  <View>
-		      <TouchableOpacity onPress={recording ? null : deleteRecording}>
-		      	<Image style = {styles.image} source = {require('../../assets/delete.png')}/>
+	      <View>
+		      <TouchableOpacity onPress={recording ? stopRecording : startRecording}>
+		      	<Image style = {styles.recordingImage} source = {recordingImg}/>
 		      </TouchableOpacity>
 		  </View>
-	  </View>
 
-      <View>
-      	  <View>
-		      <TouchableOpacity onPress={recording ? null : saveRecording}>
-		      	<Image style = {styles.image} source = {require('../../assets/save.png')}/>
+		  <View style = {styles.replayAndDelete}>
+			  <View >
+			      <TouchableOpacity onPress={recording ? null : replay}>
+			      	<Image style = {styles.image} source = {require('../../assets/replay.png')}/>
+			      </TouchableOpacity>
+			  </View>
+
+			  <View>
+			      <TouchableOpacity onPress={recording ? null : deleteRecording}>
+			      	<Image style = {styles.image} source = {require('../../assets/delete.png')}/>
+			      </TouchableOpacity>
+			  </View>
+		  </View>
+
+	      <View>
+	      	  <View>
+			      <TouchableOpacity onPress={recording ? null : saveRecording}>
+			      	<Image style = {styles.image} source = {require('../../assets/save.png')}/>
+			      </TouchableOpacity>
+		  	  </View>
+		  </View>
+
+		  <View stye = {styles.text}>
+		      <Text>{savingDialogue}</Text>
+		  </View>
+
+	      <View>
+	      	<TextInput 
+	      		style = {styles.background} 
+	      		placeholder = "Recording's name"
+	      		onChangeText={text => setName(text)}
+	      	/>
+	      </View>
+	    </View>
+	    )
+	}
+
+	else if(currentScreen == "Listening"){
+		return(<View>
+	     	<View style= {styles.screenButtons}>
+		      <TouchableOpacity 
+		      	onPress={() =>  setSreen("Recording")} style ={styles.screenButton} >
+		      	<Text style = {styles.text}>Recording</Text>
 		      </TouchableOpacity>
-	  	  </View>
-	  </View>
 
-	  <View stye = {styles.text}>
-	      <Text>{savingDialogue}</Text>
-	  </View>
+		      <TouchableOpacity onPress={() =>  setSreen("Listening")} style ={styles.screenButton} >
+		      	<Text style = {styles.text}>Listening</Text>
+		      </TouchableOpacity>
 
-      <View>
-      	<TextInput 
-      		style = {styles.background} 
-      		placeholder = "Recording's name"
-      		onChangeText={text => setName(text)}
-      	/>
-      </View>
+		      <TouchableOpacity onPress={() =>  setSreen("Editing")} style ={styles.screenButton} >
+		      	<Text style = {styles.text}>Editing</Text>
+		      </TouchableOpacity>
+		  	</View>
 
-      <FlatList
-      	data = {recordings}
-      	keyExtractor = { (recording) => {return recording}}
-      	renderItem = {({item}) => {
-      		return(
-      			<View >
-      				<TouchableOpacity
-      					style = {styles.trackList}
-      					onPress = {() => replaySpecific(item.uriAddress)}
-      				>
-				        <Text style = {styles.trackListText}> {item.name}</Text>
-				    </TouchableOpacity>
-      				
-      			</View>
-      		)
-      	}
-      	}
-      />
-    </View>
-    )
+			<FlatList
+	      	data = {recordings}
+	      	keyExtractor = { (recording) => {return recording}}
+		      	renderItem = {({item}) => {
+		      		return(
+		      			<View>
+		      				<TouchableOpacity
+		      					style = {styles.trackList}
+		      					onPress = {() => replaySpecific(item.uriAddress)}
+		      				>
+						        <Text style = {styles.trackListText}> {item.name}</Text>
+						    </TouchableOpacity>
+		      			</View>
+		      		)
+		      	}
+	      	}
+	      />
+		</View>
+		)
+	}
+
+	else {
+		return(<View>
+	     	<View style= {styles.screenButtons}>
+		      <TouchableOpacity 
+		      	onPress={() =>  setSreen("Recording")} style ={styles.screenButton} >
+		      	<Text style = {styles.text}>Recording</Text>
+		      </TouchableOpacity>
+
+		      <TouchableOpacity onPress={() =>  setSreen("Listening")} style ={styles.screenButton} >
+		      	<Text style = {styles.text}>Listening</Text>
+		      </TouchableOpacity>
+
+		      <TouchableOpacity onPress={() =>  setSreen("Editing")} style ={styles.screenButton} >
+		      	<Text style = {styles.text}>Editing</Text>
+		      </TouchableOpacity>
+		  </View>
+		</View>
+		)
+	}
 };
 
 const styles = StyleSheet.create({
@@ -255,6 +313,30 @@ const styles = StyleSheet.create({
   trackListText:{
     fontSize: 20,
     margin: 10
+  },
+
+  screenButtons: {
+  	flexDirection: 'row',
+  	justifyContent: 'space-evenly',
+  	alignItems: 'center',
+  },
+
+  screenButton: {
+  	flex: 1,
+  	height: 50,
+  	justifyContent: 'center',
+  	backgroundColor: '#cccccc',
+  	textAlign: 'center',
+  	borderWidth: 2,
+  },
+
+  chosenScreenButton: {
+  	flex: 1,
+  	height: 50,
+  	justifyContent: 'center',
+  	backgroundColor: '#cccccc',
+  	textAlign: 'center',
+  	borderWidth: 2,
   }
 });
 

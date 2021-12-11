@@ -13,7 +13,7 @@ const navigator = createStackNavigator(
     Editing: EditingScreen,
   },
   {
-    initialRouteName: "Home",
+    initialRouteName: "Recording",
     defaultNavigationOptions: {
       title: "App",
     },
